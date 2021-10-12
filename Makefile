@@ -11,12 +11,12 @@ include .env
 .build-ubi8-podman:
 	@echo "======== BUILDING IGNITION IMAGE LOCALLY (SINGLE ARCHITECTURE) ========"
 	$(IGNITION_VERSION_CHECK)
-	podman build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --format docker --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile.ubi8 .
+	podman build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --format docker --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile .
 
 .build-ubi8:
 	@echo "======== BUILDING IGNITION IMAGE LOCALLY (SINGLE ARCHITECTURE) ========"
 	$(IGNITION_VERSION_CHECK)
-	docker build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile.ubi8 .
+	docker build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile .
 
 .push-registry:
 	@echo "======== PUSHING AND TAGGING IMAGES TO REGISTRY ========"
