@@ -8,17 +8,28 @@ IGNITION_RC_VERSION:=$$(grep -Po '(?<=IGNITION_RC_VERSION=\")((\d\.){2}\d+-rc\d)
 # Pull in base options (if called from this directory)
 include .env
 
-.build-ubi8-podman:
+.build:
 	@echo "======== BUILDING IGNITION IMAGE LOCALLY (SINGLE ARCHITECTURE) ========"
 	$(IGNITION_VERSION_CHECK)
 	podman build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --format docker --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile .
 
-.build-ubi8:
+.build-docker:
 	@echo "======== BUILDING IGNITION IMAGE LOCALLY (SINGLE ARCHITECTURE) ========"
 	$(IGNITION_VERSION_CHECK)
 	docker build ${DOCKER_BUILD_OPTS} ${DOCKER_BUILD_ARGS} --build-arg BUILD_EDITION=STABLE -t ${BASE_IMAGE_NAME}:${IGNITION_VERSION} -f Dockerfile .
 
 .push-registry:
+	@echo "======== PUSHING AND TAGGING IMAGES TO REGISTRY ========"
+	podman push ${BASE_IMAGE_NAME}:${IGNITION_VERSION}
+	podman tag ${BASE_IMAGE_NAME}:${IGNITION_VERSION} ${BASE_IMAGE_NAME}:8.1
+	podman push ${BASE_IMAGE_NAME}:8.1
+	podman tag ${BASE_IMAGE_NAME}:${IGNITION_VERSION} ${BASE_IMAGE_NAME}:latest
+	podman push ${BASE_IMAGE_NAME}:latest
+	@if [[ -n "${IGNITION_RC_VERSION}" ]]; then \
+		podman push ${BASE_IMAGE_NAME}:${IGNITION_RC_VERSION} \
+	fi
+
+.push-registry-docker:
 	@echo "======== PUSHING AND TAGGING IMAGES TO REGISTRY ========"
 	docker push ${BASE_IMAGE_NAME}:${IGNITION_VERSION}
 	docker tag ${BASE_IMAGE_NAME}:${IGNITION_VERSION} ${BASE_IMAGE_NAME}:8.1
@@ -33,5 +44,5 @@ include .env
 all:
 	@echo "Please specify a build target: build, multibuild, build-rc, multibuild-rc, build-nightly, multibuild-nightly"
 
-build-ubi8-podman: .build-ubi8-podman
-build-ubi8: .build-ubi8
+build: .build
+build-docker: .build-docker
